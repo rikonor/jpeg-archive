@@ -14,11 +14,29 @@ package main
 // #cgo LDFLAGS: -lm
 //
 // #include <stdlib.h>
+// #include <stdbool.h>
 // #include "src/recompress.h"
+//
+// typedef struct {
+//     bool	ok;
+//     recompress_error_t *err;
+// } recompress_result_t;
+//
+// recompress_result_t go_recompress(const char *input, const char *output,
+//                                   const recompress_options_t *options) {
+//     recompress_error_t **error = malloc(sizeof(recompress_error_t *));
+//     bool ok = recompress(input, output, options, error);
+//     recompress_result_t res = {};
+//     res.ok = ok;
+//     res.err = ok ? NULL : *error;
+//     free(error);
+//     return res;
+// }
 import "C"
 
 import (
 	"fmt"
+	"os"
 	"unsafe"
 )
 
@@ -47,6 +65,11 @@ func main() {
 	output := C.CString("foo-go.jpg")
 	defer C.free(unsafe.Pointer(output))
 
-	ok := C.recompress(input, output, &options, nil)
-	fmt.Println("Hello, World", ok)
+	res := C.go_recompress(input, output, &options)
+	if !res.ok {
+		defer C.free(unsafe.Pointer(res.err))
+		fmt.Fprintln(os.Stderr, C.GoString(&res.err.message[0]))
+	}
+
+	fmt.Println("Hello, World", res.ok)
 }
