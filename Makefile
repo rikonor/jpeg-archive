@@ -33,7 +33,7 @@ endif
 
 LIBIQA=src/iqa/build/release/libiqa.a
 
-all: jpeg-recompress jpeg-compare jpeg-hash
+all: jpeg-recompress jpeg-compare jpeg-hash jpeg-archive-inplace
 
 $(LIBIQA):
 	cd src/iqa; RELEASE=1 $(MAKE)
@@ -54,6 +54,9 @@ test: test/test.c src/util.o src/edit.o src/hash.o
 	$(CC) $(CFLAGS) -o test/$@ $^ $(LIBJPEG) $(LDFLAGS)
 	./test/$@
 
+jpeg-archive-inplace: jpeg-archive-inplace.go src/util.o src/edit.o src/smallfry.o src/commander.o src/recompress.o $(LIBIQA)
+	CFLAGS="$(MOZJPEG_CFLAGS)" go build $<
+
 install: all
 	mkdir -p $(PREFIX)/bin
 	cp jpeg-archive $(PREFIX)/bin/
@@ -62,6 +65,6 @@ install: all
 	cp jpeg-hash $(PREFIX)/bin/
 
 clean:
-	rm -rf jpeg-recompress jpeg-compare jpeg-hash test/test src/*.o src/iqa/build
+	rm -rf jpeg-recompress jpeg-compare jpeg-hash jpeg-archive-inplace test/test src/*.o src/iqa/build
 
 .PHONY: test install clean
