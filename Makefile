@@ -55,7 +55,7 @@ test: test/test.c src/util.o src/edit.o src/hash.o
 	./test/$@
 
 jpeg-archive-inplace: jpeg-archive-inplace.go src/util.o src/edit.o src/smallfry.o src/commander.o src/recompress.o $(LIBIQA)
-	CFLAGS="$(MOZJPEG_CFLAGS)" go build $<
+	go build $<
 
 install: all
 	mkdir -p $(PREFIX)/bin
