@@ -1,9 +1,12 @@
 cmake_minimum_required (VERSION 3.0)
 project (jpeg-archive)
 
+enable_testing ()
+
 include (ExternalProject)
 
 add_subdirectory (src)
+add_subdirectory (test)
 
 include_directories (SYSTEM ${MOZJPEG_INCLUDE_DIR})
 
@@ -39,4 +42,9 @@ set_property (
     DIRECTORY
     APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
         ${CMAKE_CURRENT_BINARY_DIR}/jpeg-archive-inplace${CMAKE_EXECUTABLE_SUFFIX}
+)
+
+install (
+    TARGETS jpeg-compare jpeg-hash jpeg-recompress jpeg-archive-inplace-app
+    DESTINATION bin
 )
