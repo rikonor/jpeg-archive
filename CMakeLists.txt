@@ -19,16 +19,16 @@ target_link_libraries (jpeg-recompress jpegarchive IQA MOZJPEG)
 find_program (GO_PROGRAM NAMES go)
 
 add_custom_target (
-    jpeg-archive-inplace ALL
+    jpeg-archive-inplace-app ALL
     ${CMAKE_COMMAND}
         -E env
-        CGO_CFLAGS="-I$<JOIN:$<TARGET_PROPERTY:jpeg-archive-inplace,INCLUDE_DIRECTORIES>, -I>"
+        CGO_CFLAGS="-I$<JOIN:$<TARGET_PROPERTY:jpeg-archive-inplace-app,INCLUDE_DIRECTORIES>, -I>"
         CGO_LDFLAGS="$<TARGET_FILE:jpegarchive> $<TARGET_FILE:IQA> $<TARGET_FILE:MOZJPEG>"
         ${GO_PROGRAM}
             build
             -o ${CMAKE_CURRENT_BINARY_DIR}/jpeg-archive-inplace${CMAKE_EXECUTABLE_SUFFIX}
             -i
-            ${CMAKE_CURRENT_SOURCE_DIR}/jpeg-archive-inplace.go    
+            ${CMAKE_CURRENT_SOURCE_DIR}/jpeg-archive-inplace.go
     BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/jpeg-archive-inplace${CMAKE_EXECUTABLE_SUFFIX}
     COMMENT go build jpeg-archive-inplace.go
     DEPENDS jpegarchive IQA MOZJPEG
