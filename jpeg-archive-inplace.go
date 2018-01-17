@@ -1,18 +1,5 @@
 package main
 
-// #cgo linux CFLAGS: -I/opt/mozjpeg/include
-// #cgo windows CFLAGS: -I../mozjpeg
-// #cgo LDFLAGS: src/util.o
-// #cgo LDFLAGS: src/edit.o
-// #cgo LDFLAGS: src/smallfry.o
-// #cgo LDFLAGS: src/commander.o
-// #cgo LDFLAGS: src/recompress.o
-// #cgo LDFLAGS: src/iqa/build/release/libiqa.a
-// #cgo linux,amd64 LDFLAGS: /opt/mozjpeg/lib64/libjpeg.a
-// #cgo linux,386 LDFLAGS: /opt/mozjpeg/lib64/libjpeg.a
-// #cgo windows LDFLAGS: ../mozjpeg/libjpeg.a
-// #cgo LDFLAGS: -lm
-//
 // #include <stdlib.h>
 // #include <stdbool.h>
 // #include "src/recompress.h"
