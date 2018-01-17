@@ -1,7 +1,9 @@
+*.exe
 build/
 src/*.o
 src/iqa/.svn
 src/iqa/build
+jpeg-archive-inplace
 jpeg-recompress
 jpeg-compare
 jpeg-hash
