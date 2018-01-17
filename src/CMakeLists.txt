@@ -50,6 +50,7 @@ add_library (
     commander.c commander.h
     edit.c edit.h
     hash.c hash.h
+    recompress.c recompress.h
     smallfry.c smallfry.h
     util.c util.h
 )
