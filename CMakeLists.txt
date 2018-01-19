@@ -25,8 +25,8 @@ add_custom_command (
     OUTPUT jpeg-archive-inplace${CMAKE_EXECUTABLE_SUFFIX}
     COMMAND ${CMAKE_COMMAND}
         -E env
-        CGO_CFLAGS="-I$<JOIN:$<TARGET_PROPERTY:jpeg-archive-inplace-app,INCLUDE_DIRECTORIES>, -I>"
-        CGO_LDFLAGS='$<TARGET_FILE:jpegarchive> $<TARGET_FILE:IQA> $<TARGET_FILE:MOZJPEG> -lm'
+        "CGO_CFLAGS=-I$<JOIN:$<TARGET_PROPERTY:jpeg-archive-inplace-app,INCLUDE_DIRECTORIES>, -I>"
+        "CGO_LDFLAGS=$<TARGET_FILE:jpegarchive> $<TARGET_FILE:IQA> $<TARGET_FILE:MOZJPEG> -lm"
         ${GO_PROGRAM}
             build
             -o ${CMAKE_CURRENT_BINARY_DIR}/jpeg-archive-inplace${CMAKE_EXECUTABLE_SUFFIX}
