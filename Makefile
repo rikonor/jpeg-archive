@@ -4,6 +4,7 @@ LDFLAGS += -lm
 MAKE ?= make
 AUTORECONF ?= autoreconf
 CMAKE ?= cmake
+GO ?= go
 PREFIX ?= /usr/local
 
 UNAME_S := $(shell uname -s)
@@ -66,7 +67,7 @@ test: test/test.c src/util.o src/edit.o src/hash.o $(LIBJPEG)
 	./test/$@
 
 jpeg-archive-inplace: jpeg-archive-inplace.go src/util.o src/edit.o src/smallfry.o src/commander.o src/recompress.o $(LIBJPEG) $(LIBIQA)
-	go build -i $<
+	$(GO) build -i $<
 
 install: all
 	mkdir -p $(PREFIX)/bin

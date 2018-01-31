@@ -4,6 +4,6 @@ compiler:
     - gcc
 before_install:
     - sudo apt-get update -qq
-    - sudo apt-get install -qq build-essential autoconf nasm
+    - sudo apt-get install -qq build-essential autoconf nasm golang
 script:
     - make && make test && cd test && ./test.sh

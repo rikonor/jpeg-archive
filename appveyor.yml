@@ -2,9 +2,10 @@ version: '{build}'
 environment:
   CC: gcc
 install:
-- cinst mingw cmake nasm
+- cinst mingw cmake nasm golang
 build_script:
-- set PATH=%PATH%;C:\tools\mingw64\bin;C:\Program Files\NASM;C:\Program Files\CMake\bin
+- set GOPATH=%APPVEYOR_BUILD_FOLDER%
+- set PATH=%PATH%;C:\tools\mingw64\bin;C:\Program Files\NASM;C:\Program Files\CMake\bin;C:\tools\go\bin
 - cd %APPVEYOR_BUILD_FOLDER%
 - mingw32-make
 after_build:
