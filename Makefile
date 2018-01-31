@@ -26,7 +26,7 @@ CFLAGS += -Isrc/mozjpeg
 
 LIBIQA=src/iqa/build/release/libiqa.a
 
-all: jpeg-recompress jpeg-compare jpeg-hash
+all: jpeg-recompress jpeg-compare jpeg-hash jpeg-archive-inplace
 
 src/mozjpeg:
 	git clone -b v3.3.1 --single-branch https://github.com/mozilla/mozjpeg.git $@
@@ -49,7 +49,7 @@ $(LIBJPEG): | src/mozjpeg
 $(LIBIQA):
 	cd src/iqa; RELEASE=1 $(MAKE)
 
-jpeg-recompress: jpeg-recompress.c src/util.o src/edit.o src/smallfry.o src/commander.o $(LIBIQA) $(LIBJPEG)
+jpeg-recompress: jpeg-recompress.c src/util.o src/edit.o src/smallfry.o src/commander.o src/recompress.o $(LIBIQA) $(LIBJPEG)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
 jpeg-compare: jpeg-compare.c src/util.o src/hash.o src/edit.o src/commander.o src/smallfry.o $(LIBIQA) $(LIBJPEG)
@@ -65,6 +65,9 @@ test: test/test.c src/util.o src/edit.o src/hash.o $(LIBJPEG)
 	$(CC) $(CFLAGS) -o test/$@ $^ $(LDFLAGS)
 	./test/$@
 
+jpeg-archive-inplace: jpeg-archive-inplace.go src/util.o src/edit.o src/smallfry.o src/commander.o src/recompress.o $(LIBJPEG) $(LIBIQA)
+	go build -i $<
+
 install: all
 	mkdir -p $(PREFIX)/bin
 	cp jpeg-archive $(PREFIX)/bin/
@@ -74,6 +77,7 @@ install: all
 
 clean:
 	rm -rf \
+		jpeg-archive-inplace \
 		jpeg-recompress \
 		jpeg-compare \
 		jpeg-hash \
