@@ -67,7 +67,8 @@ test: test/test.c src/util.o src/edit.o src/hash.o $(LIBJPEG)
 	./test/$@
 
 jpeg-archive-inplace: jpeg-archive-inplace.go src/util.o src/edit.o src/smallfry.o src/commander.o src/recompress.o $(LIBJPEG) $(LIBIQA)
-	$(GO) build -i $<
+	$(GO) get github.com/dustin/go-humanize
+	$(GO) build $<
 
 install: all
 	mkdir -p $(PREFIX)/bin
