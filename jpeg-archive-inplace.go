@@ -1,6 +1,6 @@
 package main
 
-// #cgo CFLAGS: -std=c99
+// #cgo CFLAGS: -std=gnu99
 // #cgo CFLAGS: -I/src/mozjpeg
 // #cgo LDFLAGS: src/util.o
 // #cgo LDFLAGS: src/edit.o
