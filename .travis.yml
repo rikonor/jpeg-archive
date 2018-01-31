@@ -5,6 +5,7 @@ compiler:
 env:
   global:
     - GOPATH="$HOME/go"
+    - MAKEFLAGS="-j2 -l2"
 before_install:
     - sudo apt-get update -qq
     - sudo apt-get install -qq build-essential autoconf nasm golang
