@@ -3,10 +3,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <fcntl.h>
 
 #ifdef _WIN32
     #include <io.h>
-    #include <fcntl.h>
 #endif
 
 #define INPUT_BUFFER_SIZE 102400
@@ -31,7 +31,7 @@ long readFile(const char *name, void **buffer) {
             setmode(fileno(stdin), O_BINARY);
         #endif
     } else {
-        file = fopen(name, "rb");
+        file = open(name, O_RDONLY);
 
         if (!file)
         {

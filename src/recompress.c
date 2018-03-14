@@ -11,9 +11,9 @@
 #include "recompress.h"
 #include "smallfry.h"
 #include "util.h"
+#include <fcntl.h>
 
 #ifdef _WIN32
-    #include <fcntl.h>
     #include <io.h>
 #endif
 
@@ -28,7 +28,7 @@ static FILE *openOutput(const char *name) {
 
         return stdout;
     } else {
-        return fopen(name, "wb");
+        return open(name, O_WRONLY|O_TRUNC);
     }
 }
 
