@@ -2,52 +2,73 @@ CC ?= gcc
 CFLAGS += -std=c99 -Wall -O3
 LDFLAGS += -lm
 MAKE ?= make
+AUTORECONF ?= autoreconf
+CMAKE ?= cmake
+GO ?= go
 PREFIX ?= /usr/local
 
 UNAME_S := $(shell uname -s)
-
 ifeq ($(UNAME_S),Linux)
-	# Linux (e.g. Ubuntu)
-	MOZJPEG_PREFIX ?= /opt/mozjpeg
-	CFLAGS += -I$(MOZJPEG_PREFIX)/include
-	LIBJPEG = $(MOZJPEG_PREFIX)/lib/libjpeg.a
+	OS = Unixy
 else ifeq ($(UNAME_S),Darwin)
-	# Mac OS X
-	MOZJPEG_PREFIX ?= /usr/local/opt/mozjpeg
-	LIBJPEG = $(MOZJPEG_PREFIX)/lib/libjpeg.a
-	CFLAGS += -I$(MOZJPEG_PREFIX)/include
+	OS = Unixy
 else ifeq ($(UNAME_S),FreeBSD)
-	# FreeBSD
-	LIBJPEG = $(PREFIX)/lib/mozjpeg/libjpeg.so
-	CFLAGS += -I$(PREFIX)/include/mozjpeg
+	OS = Unixy
 else
-	# Windows
-	LIBJPEG = ../mozjpeg/libjpeg.a
-	CFLAGS += -I../mozjpeg
+	OS = Windows
 endif
+
+ifeq ($(OS),Unixy)
+	LIBJPEG = src/mozjpeg/.libs/libjpeg.a
+else
+	LIBJPEG = src/mozjpeg/libjpeg.a
+endif
+CFLAGS += -Isrc/mozjpeg
 
 LIBIQA=src/iqa/build/release/libiqa.a
 
-all: jpeg-recompress jpeg-compare jpeg-hash
+all: jpeg-recompress jpeg-compare jpeg-hash jpeg-archive-inplace
+
+src/mozjpeg:
+	git clone -b v3.3.1 --single-branch https://github.com/mozilla/mozjpeg.git $@
+ifeq ($(OS),Unixy)
+	cd $@ && \
+		$(AUTORECONF) -fiv && \
+		./configure --with-jpeg8
+else
+	cd $@ && \
+		$(CMAKE) -G "MSYS Makefiles" \
+			-DCMAKE_C_COMPILER=$(CC) \
+			-DCMAKE_MAKE_PROGRAM=$(MAKE) \
+			-DCMAKE_BUILD_TYPE=RELWITHDEBINFO \
+			-DWITH_JPEG8=1 .
+endif
+
+$(LIBJPEG): | src/mozjpeg
+	cd $| && $(MAKE)
 
 $(LIBIQA):
 	cd src/iqa; RELEASE=1 $(MAKE)
 
-jpeg-recompress: jpeg-recompress.c src/util.o src/edit.o src/smallfry.o src/commander.o $(LIBIQA)
-	$(CC) $(CFLAGS) -o $@ $^ $(LIBJPEG) $(LDFLAGS)
+jpeg-recompress: jpeg-recompress.c src/util.o src/edit.o src/smallfry.o src/commander.o src/recompress.o $(LIBIQA) $(LIBJPEG)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
-jpeg-compare: jpeg-compare.c src/util.o src/hash.o src/edit.o src/commander.o  src/smallfry.o $(LIBIQA)
-	$(CC) $(CFLAGS) -o $@ $^ $(LIBJPEG) $(LDFLAGS)
+jpeg-compare: jpeg-compare.c src/util.o src/hash.o src/edit.o src/commander.o src/smallfry.o $(LIBIQA) $(LIBJPEG)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
-jpeg-hash: jpeg-hash.c src/util.o src/hash.o src/commander.o
-	$(CC) $(CFLAGS) -o $@ $^ $(LIBJPEG) $(LDFLAGS)
+jpeg-hash: jpeg-hash.c src/util.o src/hash.o src/commander.o $(LIBJPEG)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
-%.o: %.c %.h
+%.o: %.c %.h | src/mozjpeg
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-test: test/test.c src/util.o src/edit.o src/hash.o
-	$(CC) $(CFLAGS) -o test/$@ $^ $(LIBJPEG) $(LDFLAGS)
+test: test/test.c src/util.o src/edit.o src/hash.o $(LIBJPEG)
+	$(CC) $(CFLAGS) -o test/$@ $^ $(LDFLAGS)
 	./test/$@
+
+jpeg-archive-inplace: jpeg-archive-inplace.go src/util.o src/edit.o src/smallfry.o src/commander.o src/recompress.o $(LIBJPEG) $(LIBIQA)
+	$(GO) get github.com/dustin/go-humanize
+	$(GO) build $<
 
 install: all
 	mkdir -p $(PREFIX)/bin
@@ -57,6 +78,16 @@ install: all
 	cp jpeg-hash $(PREFIX)/bin/
 
 clean:
-	rm -rf jpeg-recompress jpeg-compare jpeg-hash test/test src/*.o src/iqa/build
+	rm -rf \
+		jpeg-archive-inplace \
+		jpeg-recompress \
+		jpeg-compare \
+		jpeg-hash \
+		test/test \
+		src/*.o \
+		src/iqa/build
 
-.PHONY: test install clean
+fullclean: clean
+	rm -rf src/mozjpeg
+
+.PHONY: test install clean fullclean

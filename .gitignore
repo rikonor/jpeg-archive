@@ -1,6 +1,9 @@
+*.exe
 src/*.o
 src/iqa/.svn
 src/iqa/build
+src/mozjpeg
+jpeg-archive-inplace
 jpeg-recompress
 jpeg-compare
 jpeg-hash
